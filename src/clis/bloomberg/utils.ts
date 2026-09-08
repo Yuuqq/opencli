@@ -7,7 +7,7 @@ export const BLOOMBERG_FEEDS = {
   industries: 'https://feeds.bloomberg.com/industries/news.rss',
   tech: 'https://feeds.bloomberg.com/technology/news.rss',
   politics: 'https://feeds.bloomberg.com/politics/news.rss',
-  businessweek: 'https://feeds.bloomberg.com/businessweek/news.rss',
+  businessweek: 'https://www.bloomberg.com/feeds/businessweek/news.rss',
   opinions: 'https://feeds.bloomberg.com/bview/news.rss',
 } as const;
 

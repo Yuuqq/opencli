@@ -168,6 +168,7 @@ export async function executeCommand(
 
   let result: unknown;
   try {
+    ensureRequiredEnv(cmd);
     if (shouldUseBrowserSession(cmd)) {
       // ── Fail-fast: only when daemon is UP but extension is not connected ──
       // If daemon is not running, let browserSession() handle auto-start as usual.
@@ -185,7 +186,6 @@ export async function executeCommand(
           '  Then run: opencli doctor',
         );
       }
-      ensureRequiredEnv(cmd);
       const BrowserFactory = getBrowserFactory();
       result = await browserSession(BrowserFactory, async (page) => {
         const preNavUrl = resolvePreNav(cmd);
