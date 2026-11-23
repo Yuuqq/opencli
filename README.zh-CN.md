@@ -25,7 +25,7 @@ CLI all electron！现在支持把所有 electron 应用 CLI 化，从而组合�
 - **多站点覆盖** — 覆盖 B站、知乎、小红书、Twitter、Reddit，以及多种桌面应用
 - **零风控** — 复用 Chrome 登录态，无需存储任何凭证
 - **外部 CLI 枢纽** — 统一发现、自动安装、透传执行 `gh`、`docker` 等本地 CLI
-- **自修复配置** — `opencli doctor` 自动启动 daemon，诊断扩展和浏览器连接状态
+- **浏览器诊断** — `opencli doctor` 在需要时启动本地 daemon，检查已安装的扩展和浏览器连接状态
 - **AI 原生** — `explore` 自动发现 API，`synthesize` 生成适配器，`cascade` 探测认证策略
 - **动态加载引擎** — 声明式的 `.yaml` 或者底层定制的 `.ts` 适配器，放入 `clis/` 文件夹即可自动注册生效
 
@@ -52,9 +52,9 @@ CLI all electron！现在支持把所有 electron 应用 CLI 化，从而组合�
 ## 前置要求
 
 - **Node.js**: >= 20.0.0
-- **Chrome** 浏览器正在运行，且**已登录目标网站**（如 bilibili.com、zhihu.com、xiaohongshu.com）
+- 使用本地 Browser Bridge 的命令需要运行 Chrome 并启用扩展。需要认证的命令还要求在同一 Chrome 配置中登录目标网站。
 
-> **⚠️ 重要**：大多数命令复用你的 Chrome 登录状态。运行命令前，你必须已在 Chrome 中打开目标网站并完成登录。如果获取到空数据或报错，请先检查你的浏览器登录状态。
+> 浏览器命令复用你的 Chrome 会话。如果需要登录的命令返回空数据或报错，请先检查登录状态。公开 API 命令（例如 `hackernews top`）无需 Chrome 或扩展。
 
 OpenCLI 通过轻量化的 **Browser Bridge** Chrome 扩展 + 微型 daemon 与浏览器通信（零配置，自动启动）。
 
@@ -387,8 +387,8 @@ opencli cascade https://api.example.com/data
 - **Node API 错误 (如 parseArgs, fs 等)**
   - 确保 Node.js 版本 `>= 20`。
 - **Daemon 问题**
-  - 检查 daemon 状态：`curl localhost:19825/status`
-  - 查看扩展日志：`curl localhost:19825/logs`
+  - 检查 daemon 状态：`opencli daemon status`
+  - 查看扩展日志：`curl -H 'X-OpenCLI: 1' http://127.0.0.1:19825/logs`
 
 
 ## Star History

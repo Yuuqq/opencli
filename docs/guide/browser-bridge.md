@@ -1,6 +1,6 @@
 # Browser Bridge Setup
 
-> **⚠️ Important**: Browser commands reuse your Chrome login session. You must be logged into the target website in Chrome before running commands.
+The Browser Bridge is the default connection for commands that need a browser. If a command requires login, sign in to the target site in the Chrome profile where the extension is enabled. Public API commands such as `hackernews top` do not need the bridge.
 
 OpenCLI connects to your browser through a lightweight **Browser Bridge** Chrome Extension + micro-daemon (zero config, auto-start).
 
@@ -19,26 +19,26 @@ OpenCLI connects to your browser through a lightweight **Browser Bridge** Chrome
 
 ## Verification
 
-That's it! The daemon auto-starts when you run any browser command. No tokens, no manual configuration.
+The daemon starts on demand when a command uses the Browser Bridge. `opencli doctor` can also start it if needed, but it does not install or enable the extension.
 
 ```bash
-opencli doctor            # Check extension + daemon connectivity
+opencli doctor             # Check the daemon, extension, and live browser connection
+opencli doctor --no-live   # Skip the live browser test; may still start the daemon
+opencli doctor --sessions  # Also list automation workspaces if the extension is connected
 ```
 
 ## How It Works
 
 ```
-┌─────────────┐     WebSocket      ┌──────────────┐     Chrome API     ┌─────────┐
-│  opencli    │ ◄──────────────► │  micro-daemon │ ◄──────────────► │  Chrome  │
-│  (Node.js)  │    localhost:19825  │  (auto-start) │    Extension       │ Browser  │
-└─────────────┘                    └──────────────┘                    └─────────┘
+opencli CLI <--- HTTP ---> daemon <--- WebSocket ---> Browser Bridge extension
+                       127.0.0.1:19825                 (in your Chrome profile)
 ```
 
-The daemon manages the WebSocket connection between your CLI commands and the Chrome extension. The extension executes JavaScript in the context of web pages, with access to the logged-in session.
+The CLI sends requests to the loopback daemon over HTTP. The daemon forwards them over the extension's WebSocket connection and returns the results to the CLI.
 
 ## Daemon Lifecycle
 
-The daemon auto-starts on first browser command and stays alive for **4 hours** by default. It exits only when both conditions are met: no CLI requests for the timeout period AND no Chrome extension connected.
+The daemon exits automatically once it has received no browser commands for **4 hours** and the Chrome extension is disconnected. It can stay running longer while the extension is connected. Checking status or logs does not reset the idle timer.
 
 ```bash
 opencli daemon status    # Check daemon state (PID, uptime, extension, memory)

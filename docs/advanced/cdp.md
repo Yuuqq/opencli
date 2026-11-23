@@ -6,7 +6,7 @@ Because CDP binds to `localhost` by default for security reasons, accessing it f
 
 This guide is broken down into three phases:
 1. **Preparation**: Start Chrome with CDP enabled locally.
-2. **Network Tunnels**: Expose that CDP port to your remote server using either **SSH Tunnels** or **Reverse Proxies**.
+2. **Network Tunnel**: Reach the loopback port from your remote server through SSH.
 3. **Execution**: Run OpenCLI on your server.
 
 ---
@@ -19,84 +19,50 @@ First, you need to start a Chrome browser on your local machine with remote debu
 ```bash
 /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome \
   --remote-debugging-port=9222 \
-  --user-data-dir="$HOME/chrome-debug-profile" \
-  --remote-allow-origins="*"
+  --user-data-dir="$HOME/chrome-debug-profile"
 ```
 
 **Linux:**
 ```bash
 google-chrome \
   --remote-debugging-port=9222 \
-  --user-data-dir="$HOME/chrome-debug-profile" \
-  --remote-allow-origins="*"
+  --user-data-dir="$HOME/chrome-debug-profile"
 ```
 
 **Windows:**
 ```cmd
 "C:\Program Files\Google\Chrome\Application\chrome.exe" ^
   --remote-debugging-port=9222 ^
-  --user-data-dir="%USERPROFILE%\chrome-debug-profile" ^
-  --remote-allow-origins="*"
+  --user-data-dir="%USERPROFILE%\chrome-debug-profile"
 ```
-
-> **Note**: The `--remote-allow-origins="*"` flag is often required for modern Chrome versions to accept cross-origin CDP WebSocket connections (e.g. from reverse proxies like ngrok).
 
 Once this browser instance opens, **log into the target websites you want to use** (e.g., bilibili.com, zhihu.com) so that the session contains the correct cookies.
 
 ---
 
-## Phase 2: Remote Access Methods
+## Phase 2: SSH Tunnel
 
-Once CDP is running locally on port `9222`, you must securely expose this port to your remote server. Choose one of the two methods below depending on your network conditions.
-
-### Method A: SSH Tunnel (Recommended)
-
-If your local machine has SSH access to the remote server, this is the most secure and straightforward method.
+Keep the debugging port private: CDP can control the browser session. Do not expose it through a public listener or unauthenticated proxy.
 
 Run this command on your **Local Machine** to forward the remote server's port `9222` back to your local port `9222`:
 
 ```bash
-ssh -R 9222:localhost:9222 your-server-user@your-server-ip
+ssh -N -R 127.0.0.1:9222:127.0.0.1:9222 your-server-user@your-server-ip
 ```
 
 Leave this SSH session running in the background.
 
-### Method B: Reverse Proxy (ngrok / frp / socat)
-
-If you cannot establish a direct SSH connection (e.g., due to NAT or firewalls), you can use an intranet penetration tool like `ngrok`.
-
-Run this command on your **Local Machine** to expose your local port `9222` to the public internet securely via ngrok:
-
-```bash
-ngrok http 9222
-```
-
-This will print a forwarding URL, such as `https://abcdef.ngrok.app`. **Copy this URL**.
-
----
-
 ## Phase 3: Execution (Remote Server)
 
-Now switch to your **Remote Server** where OpenCLI is installed. 
-
-Depending on the network tunnel method you chose in Phase 2, set the `OPENCLI_CDP_ENDPOINT` environment variable and run your commands.
-
-### If you used Method A (SSH Tunnel):
+On the remote server, check the forwarded endpoint, then try a command that uses the browser:
 
 ```bash
-export OPENCLI_CDP_ENDPOINT="http://localhost:9222"
-opencli doctor                    # Verify connection
-opencli bilibili hot --limit 5    # Test a command
+export OPENCLI_CDP_ENDPOINT="http://127.0.0.1:9222"
+curl --fail "$OPENCLI_CDP_ENDPOINT/json/version"
+opencli bilibili hot --limit 5
 ```
 
-### If you used Method B (Reverse Proxy like ngrok):
-
-```bash
-# Use the URL you copied from ngrok earlier
-export OPENCLI_CDP_ENDPOINT="https://abcdef.ngrok.app"
-opencli doctor                    # Verify connection
-opencli bilibili hot --limit 5    # Test a command
-```
+`opencli doctor` checks the local Browser Bridge, not the direct CDP endpoint.
 
 > *Tip: If you provide a standard HTTP/HTTPS CDP endpoint, OpenCLI requests the `/json` target list and picks the most likely inspectable app/page target automatically. If multiple app targets exist, you can further narrow selection with `OPENCLI_CDP_TARGET` (for example `antigravity` or `codex`).*
 

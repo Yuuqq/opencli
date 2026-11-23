@@ -18,6 +18,8 @@
 | `opencli v2ex me` | My profile (auth required) |
 | `opencli v2ex notifications` | My notifications (auth required) |
 
+`hot` and `latest` return `id`, `rank`, `title`, `node` (the node title), `replies`, and `url`. Pass a returned `id`, not the list rank, to `opencli v2ex topic <id>` or `opencli v2ex replies <id>`.
+
 ## Usage Examples
 
 ```bash
