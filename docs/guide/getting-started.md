@@ -14,7 +14,7 @@ OpenCLI turns **any website** or **Electron app** into a command-line interface 
 - **CLI All Electron** — CLI-ify apps like Antigravity Ultra! Now AI can control itself natively.
 - **Account-safe** — Reuses Chrome's logged-in state; your credentials never leave the browser.
 - **AI Agent ready** — `explore` discovers APIs, `synthesize` generates adapters, `cascade` finds auth strategies.
-- **Self-healing setup** — `opencli doctor` auto-starts the daemon and diagnoses extension + live browser connectivity.
+- **Browser diagnostics** — `opencli doctor` starts the local daemon if needed and checks extension and live browser connectivity.
 - **Dynamic Loader** — Simply drop `.ts` or `.yaml` adapters into the `clis/` folder for auto-registration.
 - **Dual-Engine Architecture** — Supports both YAML declarative data pipelines and robust browser runtime TypeScript injections.
 
@@ -28,6 +28,8 @@ npm install -g @jackwener/opencli
 
 ### Basic Usage
 
+Set up the [Browser Bridge](/guide/browser-bridge) before running local browser commands. You can try `list` and the public API example without Chrome.
+
 ```bash
 opencli list                              # See all commands
 opencli hackernews top --limit 5          # Public API, no browser
@@ -37,7 +39,7 @@ opencli zhihu hot -f json                 # JSON output
 
 ### Output Formats
 
-All built-in commands support `--format` / `-f`:
+Adapter commands and `opencli list` accept `--format` / `-f`:
 
 ```bash
 opencli bilibili hot -f table   # Default: rich terminal table

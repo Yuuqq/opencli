@@ -13,6 +13,7 @@
 | `opencli instagram followers` | List user's followers |
 | `opencli instagram following` | List user's following |
 | `opencli instagram saved` | Get your saved posts |
+| `opencli instagram download <url> [--path <dir>]` | Download images or videos from a post, reel, or IGTV URL |
 
 ## Usage Examples
 
@@ -38,6 +39,14 @@ opencli instagram saved --limit 10
 
 # JSON output
 opencli instagram profile nasa -f json
+```
+
+### Download Media
+
+Pass the full Instagram URL. Files go under `~/Downloads/Instagram/<shortcode>/` by default. Use `--path` to change the base directory; OpenCLI still creates a subdirectory named for the post's shortcode.
+
+```bash
+opencli instagram download 'https://www.instagram.com/p/SHORTCODE/' --path ./media
 ```
 
 ## Prerequisites

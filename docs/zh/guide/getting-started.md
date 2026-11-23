@@ -13,6 +13,8 @@ npm install -g @jackwener/opencli
 
 ## 基本使用
 
+运行本地浏览器命令前，请先设置 [Browser Bridge](/zh/guide/browser-bridge)。`list` 和下面的公开 API 示例无需 Chrome。
+
 ```bash
 opencli list                              # 查看所有命令
 opencli hackernews top --limit 5          # 公开 API，无需浏览器
@@ -22,7 +24,7 @@ opencli zhihu hot -f json                 # JSON 输出
 
 ## 输出格式
 
-所有命令支持 `--format` / `-f`：
+适配器命令和 `opencli list` 支持 `--format` / `-f`：
 
 ```bash
 opencli bilibili hot -f table   # 默认：终端表格

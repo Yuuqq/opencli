@@ -35,7 +35,7 @@ Run `opencli list` for the live registry.
 | **[douban](./browser/douban)** | `search` `top250` `subject` `photos` `download` `marks` `reviews` `movie-hot` `book-hot` | 🔐 Browser |
 | **[facebook](./browser/facebook)** | `feed` `profile` `search` `friends` `groups` `events` `notifications` `memories` `add-friend` `join-group` | 🔐 Browser |
 | **[imdb](./browser/imdb)** | `search` `title` `top` `trending` `person` `reviews` | 🌐 / 🔐 |
-| **[instagram](./browser/instagram)** | `explore` `profile` `search` `user` `followers` `following` `follow` `unfollow` `like` `unlike` `comment` `save` `unsave` `saved` | 🔐 Browser |
+| **[instagram](./browser/instagram)** | `explore` `profile` `search` `user` `followers` `following` `follow` `unfollow` `like` `unlike` `comment` `save` `unsave` `saved` `download` | 🔐 Browser |
 | **[medium](./browser/medium)** | `feed` `search` `user` | 🔐 Browser |
 | **[sinablog](./browser/sinablog)** | `hot` `search` `article` `user` | 🔐 Browser |
 | **[substack](./browser/substack)** | `feed` `search` `publication` | 🔐 Browser |

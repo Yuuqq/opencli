@@ -5,29 +5,20 @@ OpenCLI is built on a **Dual-Engine Architecture** that supports both declarativ
 ## High-Level Architecture
 
 ```
-┌─────────────────────────────────────────────────────┐
-│                     opencli CLI                      │
-│              (Commander.js entry point)               │
-├─────────────────────────────────────────────────────┤
-│                   Engine Layer                        │
-│  ┌──────────────┐  ┌──────────────┐  ┌────────────┐ │
-│  │   Registry   │  │   Dynamic    │  │   Output   │ │
-│  │  (commands)  │  │   Loader     │  │ Formatter  │ │
-│  └──────────────┘  └──────────────┘  └────────────┘ │
-├─────────────────────────────────────────────────────┤
-│                 Adapter Layer                         │
-│  ┌─────────────────┐  ┌──────────────────────────┐  │
-│  │  YAML Pipeline  │  │  TypeScript Adapters     │  │
-│  │  (declarative)  │  │  (browser/desktop/AI)    │  │
-│  └─────────────────┘  └──────────────────────────┘  │
-├─────────────────────────────────────────────────────┤
-│              Connection Layer                         │
-│  ┌─────────────────┐  ┌──────────────────────────┐  │
-│  │ Browser Bridge  │  │  CDP (Chrome DevTools)   │  │
-│  │ (Extension+WS)  │  │  (Electron apps)         │  │
-│  └─────────────────┘  └──────────────────────────┘  │
-└─────────────────────────────────────────────────────┘
+Adapter discovery --> Registry --> Commander.js
+                                        |
+                                  executeCommand
+                                        |
+                         YAML pipeline or TypeScript handler
+                                        |
+    Runtime access                      +-- No browser: runs locally
+    (as required)                       +-- Browser Bridge (default)
+                                        |     CLI --HTTP--> daemon --WebSocket--> extension
+                                        +-- Direct CDP (OPENCLI_CDP_ENDPOINT set)
+                                              CLI --> Chrome or Electron debugging target
 ```
+
+Commander formats the result after the adapter returns. Registered external CLIs are passed through to their own binaries instead.
 
 ## Core Modules
 
@@ -41,10 +32,10 @@ CLI discovery and manifest loading. Discovers commands from YAML and TypeScript 
 Command execution: argument validation, lazy loading of adapter modules, and executing the appropriate handler function.
 
 ### Commander Adapter (`src/commanderAdapter.ts`)
-Bridges the Registry commands to Commander.js subcommands. Handles positional args, named options, browser session wiring, and output formatting. Isolates all Commander-specific logic so the core is framework-agnostic.
+Bridges registry commands to Commander.js subcommands. It parses positional arguments and options, calls the execution layer, and formats results and errors.
 
-### Browser (`src/browser.ts`)
-Manages connections to Chrome via the Browser Bridge WebSocket daemon. Handles JSON-RPC messaging, tab management, and extension/standalone mode switching.
+### Browser (`src/runtime.ts`, `src/browser/`)
+The execution layer checks whether a command needs a browser. For browser sessions, the runtime chooses the direct CDP bridge if `OPENCLI_CDP_ENDPOINT` is set, or the local [Browser Bridge](../guide/browser-bridge.md) otherwise.
 
 ### Pipeline (`src/pipeline/`)
 The YAML pipeline engine. Processes declarative steps:
@@ -59,7 +50,7 @@ Unified output formatting: `table`, `json`, `yaml`, `md`, `csv`.
 
 ## Authentication Strategies
 
-OpenCLI uses a 3-tier authentication strategy:
+OpenCLI recognizes five adapter strategies:
 
 | Strategy | How It Works | When to Use |
 |----------|-------------|-------------|
@@ -81,18 +72,17 @@ src/
 ├── registry.ts          # Command registry
 ├── serialization.ts     # Command serialization helpers
 ├── runtime.ts           # Browser session & timeout management
-├── browser/             # Browser Bridge connection
+├── browser/             # Browser Bridge and direct CDP clients
+├── daemon.ts            # Loopback HTTP and extension WebSocket server
 ├── output.ts            # Output formatting
 ├── doctor.ts            # Diagnostic tool
 ├── pipeline/            # YAML pipeline engine
-│   ├── runner.ts
+│   ├── executor.ts
 │   ├── template.ts
-│   ├── transform.ts
 │   └── steps/
 │       ├── fetch.ts
-│       ├── map.ts
-│       ├── limit.ts
-│       ├── filter.ts
+│       ├── browser.ts
+│       ├── transform.ts # Includes map, limit, and filter
 │       └── download.ts
 └── clis/                # Site adapters
     ├── twitter/

@@ -25,7 +25,7 @@ A CLI tool that turns **any website**, **Electron app**, or **local CLI tool** i
 - **Anti-detection built-in** — Patches `navigator.webdriver`, stubs `window.chrome`, fakes plugin lists, cleans ChromeDriver/Playwright globals, and strips CDP frames from Error stack traces. Extensive anti-fingerprinting and risk-control evasion measures baked in at every layer.
 - **AI Agent ready** — `explore` discovers APIs, `synthesize` generates adapters, `cascade` finds auth strategies.
 - **External CLI Hub** — Discover, auto-install, and passthrough commands to any external CLI (gh, obsidian, docker, etc). Zero setup.
-- **Self-healing setup** — `opencli doctor` diagnoses and auto-starts the daemon, extension, and live browser connectivity.
+- **Browser diagnostics** — `opencli doctor` starts the local daemon if needed and checks the installed extension and live browser connection.
 - **Dynamic Loader** — Simply drop `.ts` or `.yaml` adapters into the `clis/` folder for auto-registration.
 - **Dual-Engine Architecture** — Supports both YAML declarative data pipelines and robust browser runtime TypeScript injections.
 
@@ -55,7 +55,7 @@ There are many great browser automation tools. Here's when opencli is the right 
 
 ### 1. Install Browser Bridge Extension
 
-> OpenCLI connects to your browser through a lightweight **Browser Bridge** Chrome Extension + micro-daemon (zero config, auto-start).
+> This step is only needed for commands that use the local Browser Bridge. Public API commands such as `hackernews top` work without Chrome.
 
 1. Go to the GitHub [Releases page](https://github.com/jackwener/opencli/releases) and download the latest `opencli-extension.zip`.
 2. Unzip the file and open `chrome://extensions`, enable **Developer mode** (top-right toggle).
@@ -110,9 +110,9 @@ git clone git@github.com:jackwener/opencli.git && cd opencli && npm install && n
 ## Prerequisites
 
 - **Node.js**: >= 20.0.0 (or **Bun** >= 1.0)
-- **Chrome** running **and logged into the target site** (e.g. bilibili.com, zhihu.com, xiaohongshu.com).
+- **Chrome** with the Browser Bridge extension enabled for local browser commands. Log into the target site in that Chrome profile when the command requires authentication.
 
-> **⚠️ Important**: Browser commands reuse your Chrome login session. You must be logged into the target website in Chrome before running commands. If you get empty data or errors, check your login status first.
+> Browser commands reuse your Chrome session. If a login-required command returns empty data or an error, check your login status first.
 
 ## Built-in Commands
 
@@ -261,7 +261,7 @@ See **[TESTING.md](./TESTING.md)** for how to run and write tests.
 - **"attach failed: Cannot access a chrome-extension:// URL"** — Another extension may be interfering. Try disabling other extensions temporarily.
 - **Empty data or 'Unauthorized' error** — Your Chrome login session may have expired. Navigate to the target site and log in again.
 - **Node API errors** — Ensure Node.js >= 20. Some dependencies require modern Node APIs.
-- **Daemon issues** — Check status: `curl localhost:19825/status` · View logs: `curl localhost:19825/logs`
+- **Daemon issues** — Run `opencli daemon status` or follow the [diagnostics guide](./docs/guide/troubleshooting.md#daemon-issues) to read extension logs.
 
 ## Star History
 

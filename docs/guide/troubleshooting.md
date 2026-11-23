@@ -24,7 +24,7 @@
 opencli daemon status
 
 # View extension logs
-curl localhost:19825/logs
+curl -H 'X-OpenCLI: 1' http://127.0.0.1:19825/logs
 
 # Stop or restart the daemon
 opencli daemon stop
@@ -34,7 +34,7 @@ opencli daemon restart
 opencli doctor
 ```
 
-> The daemon auto-exits after 4 hours of inactivity (no CLI requests and no extension connection). Override with `OPENCLI_DAEMON_TIMEOUT` (milliseconds, `0` = never timeout).
+See [Daemon Lifecycle](./browser-bridge.md#daemon-lifecycle) for idle shutdown and timeout settings.
 
 ### Desktop adapter connection issues
 

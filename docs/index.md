@@ -27,8 +27,8 @@ features:
     title: Dual-Engine Architecture
     details: Supports both YAML declarative data pipelines and robust browser runtime TypeScript injections for maximum flexibility.
   - icon: 🔧
-    title: Self-Healing Setup
-    details: "opencli doctor auto-starts the daemon and diagnoses extension + live browser connectivity."
+    title: Browser Diagnostics
+    details: "opencli doctor starts the local daemon if needed and checks extension and live browser connectivity."
   - icon: 📦
     title: Dynamic Loader
     details: Simply drop .ts or .yaml adapters into the clis/ folder for auto-registration. Zero boilerplate.

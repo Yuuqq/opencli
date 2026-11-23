@@ -15,7 +15,8 @@ Run OpenCLI on a server or headless environment by connecting to a remote Chrome
 ```bash
 # On the remote machine (or your Mac)
 /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome \
-  --remote-debugging-port=9222
+  --remote-debugging-port=9222 \
+  --user-data-dir="$HOME/chrome-debug-profile"
 ```
 
 ### 2. SSH Tunnel (If Needed)
@@ -43,9 +44,11 @@ export OPENCLI_CDP_ENDPOINT="http://127.0.0.1:9222"
 # Test the connection
 curl http://127.0.0.1:9222/json/version
 
-# Run a diagnostic
-opencli doctor
+# Run a browser command against the configured CDP endpoint
+opencli bilibili hot --limit 5
 ```
+
+`opencli doctor` checks the local Browser Bridge, not the direct CDP endpoint. Sign in to the target site in the debug profile if the command requires login.
 
 ## CI/CD Integration
 
@@ -59,14 +62,15 @@ steps:
   - run: |
       xvfb-run --auto-servernum \
         ${{ steps.setup-chrome.outputs.chrome-path }} \
-        --remote-debugging-port=9222 &
+        --remote-debugging-port=9222 \
+        --user-data-dir="$(mktemp -d)" &
 ```
 :::
 
-Set the browser executable path:
+Point OpenCLI at the running browser:
 ::: v-pre
 ```yaml
 env:
-  OPENCLI_BROWSER_EXECUTABLE_PATH: ${{ steps.setup-chrome.outputs.chrome-path }}
+  OPENCLI_CDP_ENDPOINT: http://127.0.0.1:9222
 ```
 :::
